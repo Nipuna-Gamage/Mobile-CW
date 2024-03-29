@@ -1,15 +1,18 @@
 package com.example.mbcw
 
 import android.os.Bundle
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.mbcw.ui.theme.MBCWTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,30 +20,30 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MBCWTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Button(onClick = { Intent(applicationContext, GuessCountry::class.java ).also { startActivity(it) } } ) {
+                            Text(text = "Guess the country")
+                        }
+                        Button(onClick = { Intent(applicationContext, GuessHint::class.java ).also { startActivity(it) } }) {
+                            Text(text = "Guess hints")
+                        }
+                        Button(onClick = { Intent(applicationContext, GuessFlag::class.java).also { startActivity(it) } }) {
+                            Text(text = "Guess the flag")
+                        }
+                        Button(onClick = { Intent(applicationContext, AdvanceLevel::class.java).also { startActivity(it) } }) {
+                            Text(text = "Advanced level")
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MBCWTheme {
-        Greeting("Android")
     }
 }
