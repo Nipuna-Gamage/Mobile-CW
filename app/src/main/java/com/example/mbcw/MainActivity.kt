@@ -29,16 +29,16 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        Button(onClick = { Intent(applicationContext, GuessCountry::class.java ).also { startActivity(it) } } ) {
+                        Button(onClick = { Intent(applicationContext, GuessTheCountry::class.java ).also { startActivity(it) } } ) {
                             Text(text = "Guess the country")
                         }
-                        Button(onClick = { Intent(applicationContext, GuessHint::class.java ).also { startActivity(it) } }) {
+                        Button(onClick = { Intent(applicationContext, GuessHints::class.java ).also { startActivity(it) } }) {
                             Text(text = "Guess hints")
                         }
-                        Button(onClick = { Intent(applicationContext, GuessFlag::class.java).also { startActivity(it) } }) {
+                        Button(onClick = { Intent(applicationContext, GuessTheFlag::class.java).also { startActivity(it) } }) {
                             Text(text = "Guess the flag")
                         }
-                        Button(onClick = { Intent(applicationContext, AdvanceLevel::class.java).also { startActivity(it) } }) {
+                        Button(onClick = { Intent(applicationContext, AdvancedLevel::class.java).also { startActivity(it) } }) {
                             Text(text = "Advanced level")
                         }
                     }

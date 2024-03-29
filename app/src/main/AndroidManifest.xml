@@ -13,6 +13,36 @@
         android:theme="@style/Theme.MBCW"
         tools:targetApi="31">
         <activity
+            android:name=".GuessTheCountry"
+            android:exported="false"
+            android:label="@string/title_activity_guess_the_country"
+            android:theme="@style/Theme.MBCW" />
+        <activity
+            android:name=".AdvancedLevel"
+            android:exported="false"
+            android:label="@string/title_activity_advanced_level"
+            android:theme="@style/Theme.MBCW" />
+        <activity
+            android:name=".GuessTheFlag"
+            android:exported="false"
+            android:label="@string/title_activity_guess_the_flag"
+            android:theme="@style/Theme.MBCW" />
+        <activity
+            android:name=".GuessHints"
+            android:exported="false"
+            android:label="@string/title_activity_guess_hints"
+            android:theme="@style/Theme.MBCW" />
+        <activity
+            android:name=".GuesstheCountry"
+            android:exported="false"
+            android:label="@string/title_activity_guessthe_country"
+            android:theme="@style/Theme.MBCW" />
+        <activity
+            android:name=".GuessCountry"
+            android:exported="false"
+            android:label="@string/title_activity_guess_country"
+            android:theme="@style/Theme.MBCW" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
