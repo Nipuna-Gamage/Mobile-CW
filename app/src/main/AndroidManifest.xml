@@ -33,16 +33,6 @@
             android:label="@string/title_activity_guess_hints"
             android:theme="@style/Theme.MBCW" />
         <activity
-            android:name=".GuesstheCountry"
-            android:exported="false"
-            android:label="@string/title_activity_guessthe_country"
-            android:theme="@style/Theme.MBCW" />
-        <activity
-            android:name=".GuessCountry"
-            android:exported="false"
-            android:label="@string/title_activity_guess_country"
-            android:theme="@style/Theme.MBCW" />
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
