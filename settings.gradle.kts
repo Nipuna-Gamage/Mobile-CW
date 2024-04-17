@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MB CW"
+rootProject.name = "Nipuna MB CW"
 include(":app")
  
