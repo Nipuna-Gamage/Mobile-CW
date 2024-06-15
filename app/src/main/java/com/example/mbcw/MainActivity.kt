@@ -9,13 +9,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.mbcw.ui.theme.MBCWTheme
 
 class MainActivity : ComponentActivity() {
@@ -29,24 +32,29 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
                     ) {
 
                         Column(
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.padding(16.dp)
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Button(onClick = { Intent(applicationContext, GuessTheCountry::class.java ).also { startActivity(it) } } ) {
+                            Text(
+                                text = "Guess Country",
+                                fontSize = 35.sp,
+                                fontStyle = FontStyle.Italic,
+                                modifier = Modifier.padding(30.dp)
+                            )
+                            Button(onClick = { Intent(applicationContext, GuessTheCountry::class.java ).also { startActivity(it) } } ,modifier = Modifier.width(200.dp)) {
                                 Text(text = "Guess the country")
                             }
-                            Button(onClick = { Intent(applicationContext, GuessHints::class.java ).also { startActivity(it) } }) {
+                            Button(onClick = { Intent(applicationContext, GuessHints::class.java ).also { startActivity(it) } },modifier = Modifier.width(200.dp)) {
                                 Text(text = "Guess hints")
                             }
-                            Button(onClick = { Intent(applicationContext, GuessTheFlag::class.java).also { startActivity(it) } }) {
+                            Button(onClick = { Intent(applicationContext, GuessTheFlag::class.java).also { startActivity(it) } },modifier = Modifier.width(200.dp)) {
                                 Text(text = "Guess the flag")
                             }
-                            Button(onClick = { Intent(applicationContext, AdvancedLevel::class.java).also { startActivity(it) } }) {
+                            Button(onClick = { Intent(applicationContext, AdvancedLevel::class.java).also { startActivity(it) } },modifier = Modifier.width(200.dp)) {
                                 Text(text = "Advanced level")
                             }
                         }
