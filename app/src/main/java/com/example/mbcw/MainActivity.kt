@@ -4,18 +4,22 @@ import android.os.Bundle
 import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,16 +39,15 @@ class MainActivity : ComponentActivity() {
                     ) {
 
                         Column(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Text(
-                                text = "Guess Country",
-                                fontSize = 35.sp,
-                                fontStyle = FontStyle.Italic,
-                                modifier = Modifier.padding(30.dp)
-                            )
+                            Image(
+                                painter = painterResource(id = R.drawable.guessgame),
+                                contentDescription = "homePageImage")
+
                             Button(onClick = { Intent(applicationContext, GuessTheCountry::class.java ).also { startActivity(it) } } ,modifier = Modifier.width(200.dp)) {
                                 Text(text = "Guess the country")
                             }
