@@ -1,71 +1,47 @@
 package com.example.mbcw
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import com.example.mbcw.ui.theme.MBCWTheme
-import com.example.mbcw.utils.readCountryDataFromAssets
-import java.util.Random
+
+var dropDownSelectedCountry = "" // user selected country from the drop down list
+var imageDisplayId = ""  // country code of the displayed image
+var guessTheCountryButtonCondition = mutableStateOf(false) // boolean condition for submit or next button
+var guessTheCountryAnswerIsCorrect = mutableStateOf(false) // boolean value to store answers state
+var guessTheCountryAlertDialogBox = mutableStateOf(false) // alert box open boolean condition
+var oneTimeRunForGuessTheCountry = false // this variable is used to conform that if statement run only once
 
 class GuessTheCountry : ComponentActivity() {
-    private var selectedCountry = ""
-    private var correctCountry = ""
-    private var isCorrect by mutableStateOf(false)
-    private var showNextButton by mutableStateOf(false)
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        oneTimeRunForGuessTheCountry = intent.getBooleanExtra("methodRun", false) // getting the boolean value from the mainActivity
+        guessTheCountryButtonCondition = mutableStateOf(false) // reverting
+        guessTheCountryAnswerIsCorrect = mutableStateOf(false) // to the
+        guessTheCountryAlertDialogBox = mutableStateOf(false) // default values
+
         super.onCreate(savedInstanceState)
-
-        // Load country flags data
-        val countryDataList = readCountryDataFromAssets(baseContext, "updated_countries.json")
-        val countryNamesList = countryDataList.map { it.first }
-        val countryFlagsList = countryDataList.map { it.second }
-
-        val random = Random()
-        val randomIndex = random.nextInt(countryFlagsList.size)
-        val randomCountryFlag = countryFlagsList[randomIndex].substringBefore(".")
-
-        val flagResourceId = resources.getIdentifier(randomCountryFlag, "drawable", packageName)
-
-        correctCountry = countryNamesList[randomIndex]
-
         setContent {
             MBCWTheme {
                 Surface(
@@ -73,200 +49,196 @@ class GuessTheCountry : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
                     ) {
-                        Text(text = "Guess The Country", fontSize = 20.sp)
-
-                        val flagResourceId = getResourceIdForRandomCountry()
-
-                        if (flagResourceId != 0) {
-                            Image(
-                                painter = painterResource(id = flagResourceId),
-                                contentDescription = "Flag Image",
-                                modifier = Modifier.size(125.dp)
-                            )
-                        } else {
-                            Log.e("FlagImage", "Resource not found for flag: $randomCountryFlag")
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            // Additional UI elements can be added here
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        Text(text = "Select the correct country:", fontSize = 20.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        ContentView(countryNamesList) { selectedCountry ->
-                            this@GuessTheCountry.selectedCountry = selectedCountry
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            ImageDisplay()
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        if (showNextButton) {
-                            Button(onClick = {
-                                generateNewImageAndReset()
-                            }) {
-                                Text(text = "Next", fontSize = 18.sp)
-                            }
-                        } else {
-                            Button(onClick = {
-                                checkAnswer()
-                            }) {
-                                Text(text = "Submit", fontSize = 18.sp)
-                            }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            dropDownList()
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        DisplayResult(isCorrect, correctCountry, selectedCountry)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            submitAndNextButton(this@GuessTheCountry)
+                        }
                     }
                 }
             }
         }
     }
-
-    private fun checkAnswer() {
-        isCorrect = false
-
-        if (selectedCountry == correctCountry) {
-            isCorrect = true
-            selectedCountry = ""
-        }
-    }
-
-    private fun generateNewImageAndReset() {
-        correctCountry = ""
-        isCorrect = false
-        showNextButton = false
-    }
-
-    private fun getResourceIdForRandomCountry(): Int {
-        // Load country flags data
-        val countryDataList = readCountryDataFromAssets(baseContext, "updated_countries.json")
-        val countryNamesList = countryDataList.map { it.first }
-        val countryFlagsList = countryDataList.map { it.second }
-
-        val random = Random()
-        val randomIndex = random.nextInt(countryFlagsList.size)
-        correctCountry = countryNamesList[randomIndex]
-
-        return resources.getIdentifier(countryFlagsList[randomIndex].substringBefore("."), "drawable", packageName)
-    }
-
-    @Composable
-    fun DisplayResult(isCorrect: Boolean, correctCountry: String, selectedCountry: String) {
-
-        if (selectedCountry.isNotEmpty()) {
-            if (isCorrect) {
-                Text(
-                    text = "CORRECT!",
-                    color = Color.Green,
-                    fontSize = 18.sp
-                )
-            } else {
-                Text(
-                    text = "WRONG! The correct country is: $correctCountry",
-                    color = Color.Red,
-                    fontSize = 18.sp
-                )
-            }
-        }
-    }
 }
 
+// Display image to the user
 @Composable
-fun ContentView(countryNamesList: List<String>, onItemSelected: (String) -> Unit) {
-    var selectedIndex by rememberSaveable { mutableStateOf(0) }
-    var buttonModifier = Modifier.width(300.dp)
+fun ImageDisplay() {
+    val countryIdAndResId = Countrie().randomImage()
+    val flagId by rememberSaveable { mutableStateOf(countryIdAndResId[0].toString()) }
+    imageDisplayId = flagId // appending country key to the imageIdDisplay
+    val flagResId = countryIdAndResId[1].toString().toInt()
+    val randomImageId by rememberSaveable { mutableIntStateOf(flagResId) }
 
-    Column(
-        modifier = Modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Card(
+        elevation = CardDefaults.cardElevation()
     ) {
-        // drop down list
-        DropdownList(
-            itemList = countryNamesList,
-            selectedIndex = selectedIndex,
-            modifier = buttonModifier,
-            onItemClick = {
-                selectedIndex = it
-                // Update selected country when an item is selected
-                onItemSelected(countryNamesList[it])
-            }
-        )
-
-        // some other contents below the selection button and under the list
-        Text(
-            text = "You have chosen ${countryNamesList[selectedIndex]}",
-            textAlign = TextAlign.Center,
-            fontSize = 18.sp,
+        Image(
+            painter = painterResource(id = randomImageId),
+            contentDescription = "Image",
             modifier = Modifier
-                .padding(10.dp)
-                .fillMaxWidth()
-                .background(Color.LightGray)
+                .size(width = 346.dp, height = 250.dp)
+                .padding(horizontal = 8.dp)
         )
     }
 }
 
-
+// Display selectable dropdown list to the user
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownList(itemList: List<String>, selectedIndex: Int, modifier: Modifier, onItemClick: (Int) -> Unit) {
-    var showDropdown by rememberSaveable { mutableStateOf(true) }
-    val scrollState = rememberScrollState()
+fun dropDownList() {
+    val countriesMap = Countrie()
+        .countriesMap
+        .entries
+        .sortedBy { it.value }
+        .associate { it.key to it.value }
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
+    var country by rememberSaveable { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
+    Box(
+        contentAlignment = Alignment.Center
+    ) {
+        ExposedDropdownMenuBox(expanded = isExpanded, onExpandedChange = { isExpanded = it }) {
+            TextField(
+                enabled = false,
+                value = country,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(
+                        onClick = { isExpanded = true },
+                        enabled = true
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    }
+                },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                modifier = Modifier
+                    .menuAnchor()
+                    .clickable {
+                        isExpanded = !isExpanded
+                    }
+            )
+            ExposedDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+                for (entry in countriesMap.entries) {
+                    DropdownMenuItem(
+                        text = { Text(countriesMap[entry.key].toString()) },
+                        onClick = {
+                            country = countriesMap[entry.key].toString()
+                            isExpanded = false
+                            dropDownSelectedCountry = country
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
 
-        // button
+// This function is used to provide user with submit button and next button
+@Composable
+fun submitAndNextButton(context: Context) {
+    // These 3 variables are used to control the button flow and alertBox
+    val statement by rememberSaveable { mutableStateOf(guessTheCountryButtonCondition) }
+    val answerState by rememberSaveable { mutableStateOf(guessTheCountryAnswerIsCorrect) }
+    val dialogBoxOpen by rememberSaveable { mutableStateOf(guessTheCountryAlertDialogBox) }
+
+    if (!statement.value) { // Checking the condition for submit button
+        Button(
+            onClick = {
+                answerState.value = checkAnswer()
+                statement.value = true
+                dialogBoxOpen.value = true
+            }
+        ) {
+            Text(text = "Submit")
+        }
+    } else {
+        Button(
+            onClick = {
+                (context as Activity).finish() // Trigger the onDestroy method and use intent to reload the same page
+                val intent = Intent(context, GuessTheCountry::class.java)
+                context.startActivity(intent)
+            }
+        ) {
+            Text(text = "Next")
+        }
+    }
+    if (dialogBoxOpen.value) {
+        val country = Countrie().countriesMap
+        country[imageDisplayId.uppercase()]?.let {
+            AlertDialogBox(condition = answerState.value, it, onClose = { dialogBoxOpen.value = false })
+        }
+    }
+}
+
+// This alert dialog box is used in all 4 activity's to notify the user with answer correct or not
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AlertDialogBox(condition: Boolean, correctName: String, onClose: () -> Unit) {
+    val color = if (condition) Color.Green else Color.Red
+    val message = if (condition) "CORRECT!" else "WRONG!"
+    val correctNameDisplay = if (condition) "" else correctName
+
+    AlertDialog(
+        onDismissRequest = { onClose() }
+    ) {
         Box(
-            modifier = modifier
-                .clickable { showDropdown = true },
+            modifier = Modifier
+                .size(width = 200.dp, height = 150.dp)
+                .background(Color.White)
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { onClose() },
             contentAlignment = Alignment.Center
         ) {
-            Text(text = itemList[selectedIndex], modifier = Modifier.padding(3.dp))
-        }
-
-        // dropdown list
-        Box() {
-            if (showDropdown) {
-                Popup(
-                    alignment = Alignment.TopCenter,
-                    properties = PopupProperties(
-                        excludeFromSystemGesture = true,
-                    ),
-                    // to dismiss on click outside
-                    onDismissRequest = { showDropdown = false }
-                ) {
-
-                    Column(
-                        modifier = modifier
-                            .heightIn(max = 90.dp)
-                            .verticalScroll(state = scrollState)
-                            .border(width = 1.dp, color = Color.Gray),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-
-                        itemList.onEachIndexed { index, item ->
-                            if (index != 0) {
-                                Divider(thickness = 1.dp, color = Color.LightGray)
-                            }
-                            Box(
-                                modifier = Modifier
-                                    .background(Color.Green)
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onItemClick(index)
-                                        showDropdown = !showDropdown
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = item,)
-                            }
-                        }
-
-                    }
-                }
+            Column {
+                Text(text = message, color = color, textAlign = TextAlign.Center)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = correctNameDisplay, color = Color.Blue, textAlign = TextAlign.Center)
             }
         }
     }
+}
+
+// This method checks the answer right or wrong and returns a boolean value
+// This method is called inside the submitAndNextButton method
+fun checkAnswer(): Boolean {
+    val countryList = Countrie().countriesMap
+    var answerState = false
+    for ((key, value) in countryList) {
+        if (value == dropDownSelectedCountry && key.lowercase() == imageDisplayId) {
+            answerState = true
+        }
+    }
+    return answerState
 }
