@@ -16,13 +16,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.mbcw.ui.theme.MBCWTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,27 +38,61 @@ class MainActivity : ComponentActivity() {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                     ) {
+                        val checkedState = remember { mutableStateOf(false) }
 
                         Column(
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
                                 .verticalScroll(rememberScrollState()),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
                             Image(
                                 painter = painterResource(id = R.drawable.guessgame),
-                                contentDescription = "homePageImage")
-
-                            Button(onClick = { Intent(applicationContext, GuessTheCountry::class.java ).also { startActivity(it) } } ,modifier = Modifier.width(200.dp)) {
+                                contentDescription = "homePageImage"
+                            )
+                            Switch(
+                                checked = checkedState.value,
+                                onCheckedChange = { checkedState.value = it }
+                            )
+                            Button(
+                                onClick = {
+                                    Intent(applicationContext, GuessTheCountry::class.java).also {
+                                        startActivity(it)
+                                    }
+                                },
+                                modifier = Modifier.width(200.dp)
+                            ) {
                                 Text(text = "Guess the country")
                             }
-                            Button(onClick = { Intent(applicationContext, GuessHints::class.java ).also { startActivity(it) } },modifier = Modifier.width(200.dp)) {
+                            Button(
+                                onClick = {
+                                    Intent(applicationContext, GuessHints::class.java).also {
+                                        startActivity(it)
+                                    }
+                                },
+                                modifier = Modifier.width(200.dp)
+                            ) {
                                 Text(text = "Guess hints")
                             }
-                            Button(onClick = { Intent(applicationContext, GuessTheFlag::class.java).also { startActivity(it) } },modifier = Modifier.width(200.dp)) {
+                            Button(
+                                onClick = {
+                                    Intent(applicationContext, GuessTheFlag::class.java).also {
+                                        startActivity(it)
+                                    }
+                                },
+                                modifier = Modifier.width(200.dp)
+                            ) {
                                 Text(text = "Guess the flag")
                             }
-                            Button(onClick = { Intent(applicationContext, AdvancedLevel::class.java).also { startActivity(it) } },modifier = Modifier.width(200.dp)) {
+                            Button(
+                                onClick = {
+                                    Intent(applicationContext, AdvancedLevel::class.java).also {
+                                        startActivity(it)
+                                    }
+                                },
+                                modifier = Modifier.width(200.dp)
+                            ) {
                                 Text(text = "Advanced level")
                             }
                         }
