@@ -8,7 +8,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -47,14 +49,16 @@ class MainActivity : ComponentActivity() {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.guessgame),
-                                contentDescription = "homePageImage"
-                            )
                             Switch(
                                 checked = checkedState.value,
                                 onCheckedChange = { checkedState.value = it }
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Image(
+                                painter = painterResource(id = R.drawable.guessgame),
+                                contentDescription = "homePageImage"
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
                             Button(
                                 onClick = {
                                     Intent(applicationContext, GuessTheCountry::class.java).also {

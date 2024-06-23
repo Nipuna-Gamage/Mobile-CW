@@ -32,11 +32,9 @@ var imageDisplayId = ""  // country code of the displayed image
 var guessTheCountryButtonCondition = mutableStateOf(false) // boolean condition for submit or next button
 var guessTheCountryAnswerIsCorrect = mutableStateOf(false) // boolean value to store answers state
 var guessTheCountryAlertDialogBox = mutableStateOf(false) // alert box open boolean condition
-var oneTimeRunForGuessTheCountry = false // this variable is used to conform that if statement run only once
 
 class GuessTheCountry : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        oneTimeRunForGuessTheCountry = intent.getBooleanExtra("methodRun", false) // getting the boolean value from the mainActivity
         guessTheCountryButtonCondition = mutableStateOf(false) // reverting
         guessTheCountryAnswerIsCorrect = mutableStateOf(false) // to the
         guessTheCountryAlertDialogBox = mutableStateOf(false) // default values
@@ -58,13 +56,6 @@ class GuessTheCountry : ComponentActivity() {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            // Additional UI elements can be added here
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
                             ImageDisplay()
                         }
                         Spacer(modifier = Modifier.height(16.dp))
@@ -75,6 +66,7 @@ class GuessTheCountry : ComponentActivity() {
                             dropDownList()
                         }
                         Spacer(modifier = Modifier.height(16.dp))
+                        //Text(text = imageDisplayId)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
