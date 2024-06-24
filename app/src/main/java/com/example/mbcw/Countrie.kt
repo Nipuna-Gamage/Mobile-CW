@@ -254,4 +254,21 @@ class Countrie {
         val flagResId = R.drawable::class.java.getField(resIdName).getInt(null)
         return listOf<Any>(randomKey, flagResId)
     }
+
+    fun ThreeRandomFlags(): Map<String,Int>{
+        val flagIdAndResIdMap = mutableMapOf<String,Int>()
+        var count = 0
+        while(count<3){
+            val keyList = randomImage()
+            if(flagIdAndResIdMap.isEmpty()){
+                flagIdAndResIdMap[keyList[0].toString()] = Integer.parseInt(keyList[1].toString())
+                count++
+
+            }else if(flagIdAndResIdMap.isNotEmpty() && !flagIdAndResIdMap.keys.contains(keyList[0].toString())){
+                flagIdAndResIdMap[keyList[0].toString()] = Integer.parseInt(keyList[1].toString())
+                count++
+            }
+        }
+        return flagIdAndResIdMap
+    }
 }
