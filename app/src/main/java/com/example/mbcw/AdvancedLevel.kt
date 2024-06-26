@@ -19,71 +19,309 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.mbcw.ui.theme.MBCWTheme
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.magnifier
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
+
+var answerList = mutableListOf<String>() // all the correct answers
+var answerCheckList = mutableStateListOf<Boolean>() // answer correct or not boolean value
+var answerColor = mutableStateListOf<Color>() // color of the answer
+var answerVisibility = mutableStateListOf<Boolean>() // make visible the correct answer for the wrong input
+var submitPressedTimes = mutableIntStateOf(0) // submit pressed count
+var totalQuestions = mutableIntStateOf(3) // total question in score bord
+var correctAnswers = mutableIntStateOf(0) // correct answers in the score board
+var advanceLevelButtonCondition = mutableStateOf(false)  // submit and next button condition
+var advanceLevelAnswerIsCorrect = mutableStateOf(false) // checking the answer correct or not and saving the boolean value
+var advanceLevelAlertBoxCondition = mutableStateOf(false)  // alertBox on off condition
 
 class AdvancedLevel : ComponentActivity() {
-    private var incorrectAttempts = 0
-    private var score by mutableStateOf(0)
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
+        val countryNameAndResIdMap = flagNameAndResId() // getting the country name and image resId
+        answerList = mutableListOf("Q1", "Q2", "Q3")                              //
+        answerCheckList = mutableStateListOf(false, false, false)                 //
+        answerColor = mutableStateListOf(Color.Black, Color.Black, Color.Black)   //
+        answerVisibility = mutableStateListOf(false, false, false)                //
+        submitPressedTimes = mutableIntStateOf(0)                           //  setting the values to default
+        advanceLevelButtonCondition = mutableStateOf(false)                 //
+        advanceLevelAnswerIsCorrect = mutableStateOf(false)                 //
+        advanceLevelAlertBoxCondition = mutableStateOf(false)               //
+        if(intent.getBooleanExtra("methodRun",false)){           //
+            totalQuestions = mutableIntStateOf(3)
+            correctAnswers = mutableIntStateOf(0)
+       }
+
+        super.onCreate(savedInstanceState)
         setContent {
             MBCWTheme {
+                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                            .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "Guess the country names:",
-                            modifier = Modifier.padding(vertical = 8.dp)
+                        Text(text = "Guess the country names:",
+                         modifier = Modifier.padding(vertical = 20.dp)
                         )
 
-                        Button(
-                            onClick = {
-                                submitGuess()
-                            }
-                        ) {
-                            Text(text = "Submit")
-                        }
+                        imageAndTextBox1(countryNameAndResIdMap)
+                        imageAndTextBox2(countryNameAndResIdMap)
+                        imageAndTextBox3(countryNameAndResIdMap)
+                        submitAndNextButtonForAdvanceLevel(this@AdvancedLevel, countryNameAndResIdMap)
 
                         Text(
-                            text = "Score: $score",
+                            text = "Score: ${correctAnswers.intValue}/${totalQuestions.intValue}  ",
                             modifier = Modifier
                                 .align(Alignment.End)
-                                .padding(top = 8.dp)
                         )
                     }
                 }
             }
         }
     }
+}
 
-    private fun submitGuess() {
-        var isCorrect = true
+// flag id and res id of the country
+fun flagNameAndResId(): Map<String,Int>{
+    val countryMap = Countrie().countriesMap
+    val flagMap = Countrie().ThreeRandomFlags()
+    val countryNameAndResIdList = mutableMapOf<String,Int>()
+    for(i in flagMap.keys.toList()){
+        countryNameAndResIdList[countryMap[i.uppercase()].toString()] = Integer.parseInt(flagMap[i].toString())
+    }
+    return countryNameAndResIdList
+}
 
-        if (isCorrect) {
-            score += 3 - incorrectAttempts
-            showResult("CORRECT!", Color.Green)
-        } else {
-            incorrectAttempts++
-            if (incorrectAttempts >= 3) {
-                showResult("WRONG!", Color.Red)
-                displayCorrectAnswers()
-            } else {
-                showResult("WRONG!", Color.Red)
-            }
+// 1st image and text field
+@Composable
+fun imageAndTextBox1(countryNameAndResId : Map<String,Int>){
+
+    val imageId by rememberSaveable{ mutableIntStateOf(countryNameAndResId.values.toList()[0]) }
+    val countryName by rememberSaveable{ mutableStateOf(countryNameAndResId.keys.toList()[0]) }
+    var text by rememberSaveable{ mutableStateOf("") }
+
+    Column (
+        modifier = Modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Card(
+            elevation = CardDefaults.cardElevation(
+            ),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Image(
+                painter = painterResource(imageId),
+                contentDescription = "Image",
+                modifier = Modifier.size(width = 200.dp, height = 100.dp)
+
+            )
+        }
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = { newValue ->
+                text = newValue
+                answerList[0] = text.lowercase()
+            },
+            textStyle = TextStyle(answerColor[0]),
+            label = { Text("enter the country name") },
+            enabled = !answerCheckList[0]
+
+        )
+        if (!answerCheckList[0] && submitPressedTimes.intValue == 3) {
+            Text(text = countryName, color = Color.Blue)
         }
     }
-    private fun showResult(message: String, color: Color) {
+}
+
+// 2nd image and text field
+@Composable
+fun imageAndTextBox2(countryNameAndResId : Map<String,Int>){
+
+    val imageId by rememberSaveable{ mutableIntStateOf(countryNameAndResId.values.toList()[1]) }
+    val countryName by rememberSaveable{ mutableStateOf(countryNameAndResId.keys.toList()[1]) }
+    var text by rememberSaveable{ mutableStateOf("") }
+
+    Column(
+        modifier = Modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Card(
+            modifier = Modifier
+                .padding(16.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 20.dp
+            ),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Image(
+                painter = painterResource(imageId),
+                contentDescription = "Image",
+                modifier = Modifier.size(width = 200.dp, height = 100.dp)
+
+            )
+        }
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = { newValue ->
+                text = newValue
+                answerList[1] = newValue.lowercase()
+            },
+            label = { Text("enter the country name") },
+            enabled = !answerCheckList[1],
+            textStyle = TextStyle(answerColor[1])
+
+        )
+
+        if (!answerCheckList[1] && submitPressedTimes.intValue == 3) {
+            Text(text = countryName, color = Color.Blue)
+        }
     }
 
-    private fun displayCorrectAnswers() {
+}
+
+// 3d image and textField
+@Composable
+fun imageAndTextBox3(countryNameAndResId : Map<String,Int>){
+
+    val imageId by rememberSaveable{ mutableIntStateOf(countryNameAndResId.values.toList()[2]) }
+    val countryName by rememberSaveable{ mutableStateOf(countryNameAndResId.keys.toList()[2]) }
+    var text by rememberSaveable{ mutableStateOf("") }
+
+    Column(
+        modifier = Modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Card(
+            modifier = Modifier
+                .padding(16.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 20.dp
+            ),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Image(
+                painter = painterResource(imageId),
+                contentDescription = "Image",
+                modifier = Modifier.size(width = 200.dp, height = 100.dp)
+
+            )
+        }
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = { newValue ->
+                if(!answerCheckList[2]){
+                    text = newValue
+                    answerList[2] = newValue.lowercase() }
+            },
+
+            label = { Text("enter the country name") },
+            enabled = !answerCheckList[2],
+            textStyle = TextStyle(answerColor[2])
+        )
+
+        if (!answerCheckList[2] && submitPressedTimes.intValue == 3) {
+            Text(text = countryName, color = Color.Blue)
+        }
+    }
+
+}
+
+// submit and next button for advance level
+@Composable
+fun submitAndNextButtonForAdvanceLevel(context: Context, countryNameAndResIdMap : Map<String,Int>){
+    val statement by rememberSaveable { mutableStateOf(advanceLevelButtonCondition) }
+
+    var answersCondition by rememberSaveable{ mutableStateOf(advanceLevelAnswerIsCorrect) }
+    var dialogBoxOpen by rememberSaveable{ mutableStateOf(advanceLevelAlertBoxCondition) }
+
+    if(!statement.value){
+        Button(
+            onClick = {
+                advanceLevelAnswersCheck(countryNameAndResIdMap)
+                answersCondition.value = answerCheckList.all { it }
+
+                if(submitPressedTimes.intValue == 2 || answersCondition.value){
+                    statement.value = true
+                    dialogBoxOpen.value = true
+                }
+
+                submitPressedTimes.intValue ++
+            }
+        ) {
+            Text(text = "Submit")
+        }
+    }else{
+        Button(
+            onClick = {
+                for(i in answerCheckList){
+                    if(i){
+                        correctAnswers.intValue ++
+                    }
+                }
+                totalQuestions.intValue += 3
+                (context as Activity).finish()
+                val intent = Intent(context, AdvancedLevel::class.java)
+                context.startActivity(intent)
+            }
+        ) {
+            Text(text = "Next")
+        }
+    }
+
+    if(dialogBoxOpen.value){
+        if(answersCondition.value){
+            AlertDialogBox(true,"", onClose = {dialogBoxOpen.value = false})
+        }else if(statement.value && answersCondition.value){
+            AlertDialogBox(true,"", onClose = {dialogBoxOpen.value = false})
+        }else if(statement.value){
+            AlertDialogBox(false,"", onClose = {dialogBoxOpen.value = false})
+        }
+    }
+
+}
+
+// checking the all three answers correct or not
+fun advanceLevelAnswersCheck(countryNameAndResIdMap : Map<String,Int>) {
+
+    for (i in 0..2) {
+        if (answerList[i] != "Q$i") {
+            if (answerList[i] == countryNameAndResIdMap.keys.toList()[i].lowercase()) {
+                answerCheckList[i] = true
+                answerColor[i] = Color.Green
+            }else{
+                answerColor[i] = Color.Red
+            }
+        }else{
+            answerColor[i] = Color.Red
+        }
     }
 }
